@@ -18,8 +18,10 @@ def count_calls(method: Callable) -> Callable:
         """
         Wrapper function that increments the call count.
         """
+        key = method.__qualname__
+
         # Increment the count
-        self._redis.incr(method.__qualname__)
+        self._redis.incr(key)
         # Call the original method
         return method(self, *args, **kwargs)
 
