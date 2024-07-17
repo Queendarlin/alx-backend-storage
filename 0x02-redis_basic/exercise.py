@@ -7,16 +7,53 @@ import uuid
 from typing import Union, Callable, Optional
 from functools import wraps
 
+
 def count_calls(method: Callable) -> Callable:
-    '''count how many times methods of Cache class are called'''
+    """
+    Decorator to count how many times a method is called.
+    """
     key = method.__qualname__
 
     @wraps(method)
     def wrapper(self, *args, **kwargs):
-        '''wrap the decorated function and return the wrapper'''
+        """
+        Wrapper function that increments the call count.
+        """
+
+        # Increment the count
         self._redis.incr(key)
+        # Call the original method
         return method(self, *args, **kwargs)
+
     return wrapper
+
+
+def call_history(method: Callable) -> Callable:
+    """
+    Decorator to store the history of inputs and
+    outputs for a particular function.
+    """
+    inputs_key = f"{method.__qualname__}:inputs"
+    outputs_key = f"{method.__qualname__}:outputs"
+
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        """
+        Wrapper function that stores inputs and outputs history.
+        """
+        # Store inputs
+        self._redis.rpush(inputs_key, str(args))
+
+        # Call the original method and store the output
+        result = method(self, *args, **kwargs)
+
+        # Store the output
+        self._redis.rpush(outputs_key, str(result))
+
+        return result
+
+    return wrapper
+
 
 class Cache:
     """Cache class to interact with Redis"""
