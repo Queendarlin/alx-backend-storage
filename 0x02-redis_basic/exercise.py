@@ -5,7 +5,7 @@ Cache module
 import redis
 import uuid
 from typing import Union, Callable, Optional
-import functools
+from functools import wraps
 
 
 def count_calls(method: Callable) -> Callable:
@@ -13,7 +13,7 @@ def count_calls(method: Callable) -> Callable:
     Decorator to count how many times a method is called.
     """
 
-    @functools.wraps(method)
+    @wraps(method)
     def wrapper(self, *args, **kwargs):
         """
         Wrapper function that increments the call count.
