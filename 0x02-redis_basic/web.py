@@ -42,30 +42,3 @@ def get_page(url: str) -> str:
     and tracking the request.
     """
     return requests.get(url).text
-
-
-# Testing the get_page function
-if __name__ == "__main__":
-    test_url = "http://google.com"
-
-    # First call, should fetch and cache
-    print("First call:", get_page(test_url))
-
-    # Second call within 10 seconds, should return cached result
-    print("Second call:", get_page(test_url))
-
-    # Display the count of accesses
-    count = redis_store.get(f"count:{test_url}").decode('utf-8')
-    print(f"Access count for {test_url}: {count}")
-
-    # Wait for 11 seconds to ensure the cache expires
-    import time
-
-    time.sleep(11)
-
-    # Third call after cache expiration, should fetch and cache again
-    print("Third call after cache expiration:", get_page(test_url))
-
-    # Display the count of accesses again
-    count = redis_store.get(f"count:{test_url}").decode('utf-8')
-    print(f"Access count for {test_url}: {count}")
